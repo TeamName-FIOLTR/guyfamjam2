@@ -9,6 +9,9 @@ var random_data : Dictionary = {}
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+#	$Viewport.size = get_tree().root.size
+#	$Camera.frustum_offset
+	Engine.time_scale = 1
 	pass # Replace with function body.
 
 
@@ -31,3 +34,21 @@ func _process(delta):
 
 func recieve_arbitrary_data(data_string, data_value):
 	random_data[data_string] = data_value
+
+
+func _input(event):
+	if event.is_action_pressed("ui_accept"):
+		var screenshot_path = "res://thingy.png"
+		var image = get_tree().get_root().get_texture().get_data()
+		
+		# Flip it on the y-axis (because it's flipped)
+		image.flip_y()
+		
+		image.save_png(screenshot_path)
+		yield(get_tree(),"idle_frame")
+		yield(get_tree(),"idle_frame")
+		yield(get_tree(),"idle_frame")
+		yield(get_tree(),"idle_frame")
+		yield(get_tree(),"idle_frame")
+		yield(get_tree(),"idle_frame")
+		get_tree().paused = !get_tree().paused

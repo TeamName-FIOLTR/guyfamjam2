@@ -1,0 +1,18 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://assets/scripts/Advanced Camera.gd" type="Script" id=1]
+
+[node name="Advanced Camera" type="Camera"]
+transform = Transform( 0.787473, -0.463601, 0.406152, 0, 0.658965, 0.752173, -0.616349, -0.592316, 0.518917, 4.67567, 14.352, 4.08617 )
+cull_mask = 1048573
+script = ExtResource( 1 )
+masking_camera_path = NodePath("Viewport/Masking Camera")
+
+[node name="Viewport" type="Viewport" parent="."]
+size = Vector2( 1920, 1080 )
+transparent_bg = true
+usage = 3
+render_target_update_mode = 3
+
+[node name="Masking Camera" type="Camera" parent="Viewport"]
+cull_mask = 1048574

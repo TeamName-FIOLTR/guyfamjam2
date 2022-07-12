@@ -1,7 +1,8 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://scenes/Player.tscn" type="PackedScene" id=1]
 [ext_resource path="res://assets/scripts/phys test.gd" type="Script" id=2]
+[ext_resource path="res://scenes/Advanced Camera.tscn" type="PackedScene" id=3]
 
 [sub_resource type="BoxShape" id=1]
 extents = Vector3( 10, 1, 10 )
@@ -13,10 +14,54 @@ size = Vector3( 20, 2, 20 )
 friction = 0.0
 bounce = 2.0
 
+[sub_resource type="Shader" id=4]
+code = "shader_type canvas_item;
+uniform sampler2D object_masker;
+uniform float mixerthing : hint_range(0,1);
+
+
+void vertex() {
+// Output:0
+
+}
+
+void fragment() {
+// Output:0
+//	COLOR = textureLod(SCREEN_TEXTURE)
+	vec4 screen_texture = texture(SCREEN_TEXTURE, SCREEN_UV);
+	vec4 mask_texture = texture(object_masker, SCREEN_UV);
+	float mask_alpha = mask_texture.a;
+	mask_texture.a = 1.0;
+	mask_texture.b = 0.0;
+	vec2 new_uv = mask_texture.rg*SCREEN_PIXEL_SIZE*10.0;
+	vec4 new_screen_texture = texture(SCREEN_TEXTURE, SCREEN_UV+new_uv);
+//	COLOR = mix(screen_texture,new_screen_texture,float(SCREEN_UV.x<(0.5*sin(TIME)+0.5)));
+//	COLOR = mix(screen_texture,mask_texture,float(SCREEN_UV.x<0.5));
+	COLOR = mix(screen_texture,new_screen_texture,mixerthing);
+	COLOR.a = 1.0;
+}
+
+void light() {
+// Output:0
+
+}
+"
+
+[sub_resource type="ViewportTexture" id=7]
+viewport_path = NodePath("Advanced Camera/Viewport")
+
+[sub_resource type="ShaderMaterial" id=6]
+resource_local_to_scene = true
+shader = SubResource( 4 )
+shader_param/mixerthing = 0.479
+shader_param/object_masker = SubResource( 7 )
+
 [node name="phys test" type="Spatial" groups=["Arbitrary Data Recievers"]]
+pause_mode = 2
 script = ExtResource( 2 )
 
 [node name="StaticBody" type="StaticBody" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0 )
 
 [node name="CollisionShape" type="CollisionShape" parent="StaticBody"]
 shape = SubResource( 1 )
@@ -24,15 +69,54 @@ shape = SubResource( 1 )
 [node name="CSGMesh" type="CSGMesh" parent="StaticBody"]
 mesh = SubResource( 2 )
 
-[node name="Player" parent="." instance=ExtResource( 1 )]
-transform = Transform( 1, 0, 0, 0, 0.103001, -0.994681, 0, 0.994681, 0.103001, 0, 4.05963, 0 )
-physics_material_override = SubResource( 3 )
-gravity_scale = 0.0
-angular_velocity = Vector3( 0, 16.449, 0 )
-angular_damp = 0.0
+[node name="StaticBody2" type="StaticBody" parent="."]
+transform = Transform( -5.96046e-08, 1, 0, -1, -5.96046e-08, 0, 0, 0, 1, -9.0194, 7.84924, 0 )
 
-[node name="Camera" type="Camera" parent="."]
-transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 6.75661, 0 )
+[node name="CollisionShape" type="CollisionShape" parent="StaticBody2"]
+shape = SubResource( 1 )
+
+[node name="CSGMesh" type="CSGMesh" parent="StaticBody2"]
+mesh = SubResource( 2 )
+
+[node name="StaticBody3" type="StaticBody" parent="."]
+transform = Transform( -5.96046e-08, 1, 0, -1, -5.96046e-08, 0, 0, 0, 1, 8.95246, 7.84924, 0 )
+
+[node name="CollisionShape" type="CollisionShape" parent="StaticBody3"]
+shape = SubResource( 1 )
+
+[node name="CSGMesh" type="CSGMesh" parent="StaticBody3"]
+mesh = SubResource( 2 )
+
+[node name="StaticBody4" type="StaticBody" parent="."]
+transform = Transform( 2.6054e-15, -4.37114e-08, -1, -1, -5.96046e-08, 0, -5.96046e-08, 1, -4.37114e-08, -0.00680542, 7.84924, -9.17258 )
+
+[node name="CollisionShape" type="CollisionShape" parent="StaticBody4"]
+shape = SubResource( 1 )
+
+[node name="CSGMesh" type="CSGMesh" parent="StaticBody4"]
+mesh = SubResource( 2 )
+
+[node name="StaticBody5" type="StaticBody" parent="."]
+transform = Transform( 2.6054e-15, -4.37114e-08, -1, -1, -5.96046e-08, 0, -5.96046e-08, 1, -4.37114e-08, -0.00680542, 7.84924, 8.4793 )
+
+[node name="CollisionShape" type="CollisionShape" parent="StaticBody5"]
+shape = SubResource( 1 )
+
+[node name="CSGMesh" type="CSGMesh" parent="StaticBody5"]
+mesh = SubResource( 2 )
+
+[node name="Player" parent="." instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, -0.928, 4, -1.695 )
+physics_material_override = SubResource( 3 )
+angular_velocity = Vector3( 0, 16.449, 0 )
+
+[node name="Advanced Camera" parent="." instance=ExtResource( 3 )]
+transform = Transform( 0.787473, -0.463601, 0.406153, 0, 0.658965, 0.752173, -0.616349, -0.592316, 0.518918, 0.246732, 1.84961, -0.868634 )
+
+[node name="ColorRect" type="ColorRect" parent="."]
+material = SubResource( 6 )
+anchor_right = 1.0
+anchor_bottom = 1.0
 
 [node name="Label" type="Label" parent="."]
 margin_right = 40.0
@@ -44,3 +128,5 @@ show_behind_parent = true
 anchor_right = 1.0
 anchor_bottom = 1.0
 color = Color( 0, 0, 0, 0.478431 )
+
+[editable path="Advanced Camera"]

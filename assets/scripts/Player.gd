@@ -7,9 +7,13 @@ export(Vector2) var input_vector
 export(float) var angle_collision_switch_threashold = 30
 export(NodePath) var spinner_collision_node_path
 export(NodePath) var fast_spinner_collision_node_path
+export(NodePath) var spinner_velocity_mesh_path
+
 
 onready var spinner_collision : CollisionShape = get_node(spinner_collision_node_path)
 onready var fast_spinner_collision : CollisionShape = get_node(fast_spinner_collision_node_path)
+onready var spinner_velocity_mesh : MeshInstance = get_node(spinner_velocity_mesh_path)
+onready var spinner_velocity_material = spinner_velocity_mesh.material_override
 
 var spinning_rate = 0
 
@@ -58,6 +62,9 @@ func _physics_process(delta):
 	get_tree().call_group("Arbitrary Data Recievers", "recieve_arbitrary_data", "Spun Angle", 360*spinning_rate*delta)
 	get_tree().call_group("Arbitrary Data Recievers", "recieve_arbitrary_data", "Spinner Collision", !spinner_collision.disabled)
 	get_tree().call_group("Arbitrary Data Recievers", "recieve_arbitrary_data", "Fast Spinner Collision", !fast_spinner_collision.disabled)
+	
+	spinner_velocity_material.set_shader_param("angular_velocity", angular_velocity)
+
 
 func _input(event):
 	if event is InputEventJoypadMotion or event is InputEventKey:
