@@ -3,6 +3,9 @@ extends Camera
 
 export(NodePath) var masking_camera_path
 onready var masking_camera = get_node(masking_camera_path)
+
+export(NodePath) var velocity_camera_path
+onready var velocity_camera = get_node(velocity_camera_path)
 # Declare member variables here. Examples:
 # var a = 2
 # var b = "text"
@@ -20,6 +23,7 @@ func _ready():
 #	self.get_frustum()
 #	self.get_camera_transform()
 	$Viewport.size = get_viewport().size
+	$"Velocity Viewport".size = get_viewport().size
 #	self.set_frustum()
 #	connect()
 	VisualServer.connect("frame_pre_draw", self,"_on_frame_pre_draw")
@@ -33,3 +37,4 @@ func _ready():
 func _on_frame_pre_draw():
 #	print("frame channnge")
 	update_camera(masking_camera)
+	update_camera(velocity_camera)

@@ -1,0 +1,57 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=2]
+
+[sub_resource type="Shader" id=4]
+code = "shader_type spatial;
+//render_mode depth_draw_always, specular_schlick_ggx, unshaded;
+render_mode unshaded, depth_draw_always;
+uniform vec3 angular_velocity;
+
+
+
+
+void vertex() {
+// Output:0
+
+}
+
+void fragment() {
+// Output:0
+//	FRAGCOORD;
+//	ALBEDO = vec3(1,0,0);
+	
+	
+	float depth = textureLod(DEPTH_TEXTURE, SCREEN_UV, 0.0).r;
+	depth = FRAGCOORD.z;
+	
+	vec4 upos = inverse(WORLD_MATRIX)*CAMERA_MATRIX*INV_PROJECTION_MATRIX * vec4(SCREEN_UV * 2.0 - 1.0, depth * 2.0 - 1.0, 1.0);
+	vec3 pixel_position = upos.xyz / upos.w;
+	vec3 local_angular_velocity = inverse(mat3(WORLD_MATRIX))*angular_velocity;
+	vec3 projection = dot(pixel_position,local_angular_velocity)/dot(local_angular_velocity,local_angular_velocity)*local_angular_velocity;
+	vec3 rejection = pixel_position-projection;
+	float rotation_lenth = length(rejection);
+	float spin_speed = rotation_lenth*length(local_angular_velocity);
+	
+	
+	vec3 n_in4p0 = vec3(spin_speed, 1.00000, 1.00000);
+	vec3 n_out4p0;
+	{
+		vec3 c = n_in4p0;
+		vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+		vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+		n_out4p0 = c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+	}
+	
+	vec3 spin_velocity = normalize(cross(local_angular_velocity, rejection))*rotation_lenth;
+	
+	ALBEDO = (PROJECTION_MATRIX*inverse(CAMERA_MATRIX)*WORLD_MATRIX*vec4(spin_velocity,0.0)).xyz;
+}
+
+void light() {
+// Output:0
+
+}
+"
+
+[resource]
+shader = SubResource( 4 )
+shader_param/angular_velocity = Vector3( 0, 1, 0 )

@@ -40,15 +40,15 @@ func _input(event):
 	if event.is_action_pressed("ui_accept"):
 		var screenshot_path = "res://thingy.png"
 		var image = get_tree().get_root().get_texture().get_data()
-		
+
 		# Flip it on the y-axis (because it's flipped)
 		image.flip_y()
-		
+
 		image.save_png(screenshot_path)
-		yield(get_tree(),"idle_frame")
-		yield(get_tree(),"idle_frame")
-		yield(get_tree(),"idle_frame")
-		yield(get_tree(),"idle_frame")
-		yield(get_tree(),"idle_frame")
-		yield(get_tree(),"idle_frame")
+#		yield(get_tree(),"idle_frame")
+#		yield(get_tree(),"idle_frame")
+#		yield(get_tree(),"idle_frame")
+#		yield(get_tree(),"idle_frame")
+#		yield(get_tree(),"idle_frame")
+#		yield(get_tree(),"idle_frame")
 		get_tree().paused = !get_tree().paused

@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://scenes/Player.tscn" type="PackedScene" id=1]
 [ext_resource path="res://assets/scripts/phys test.gd" type="Script" id=2]
@@ -17,6 +17,7 @@ bounce = 2.0
 [sub_resource type="Shader" id=4]
 code = "shader_type canvas_item;
 uniform sampler2D object_masker;
+uniform sampler2D object_velocities;
 uniform float mixerthing : hint_range(0,1);
 
 
@@ -30,14 +31,23 @@ void fragment() {
 //	COLOR = textureLod(SCREEN_TEXTURE)
 	vec4 screen_texture = texture(SCREEN_TEXTURE, SCREEN_UV);
 	vec4 mask_texture = texture(object_masker, SCREEN_UV);
+	vec4 velocities_texture = texture(object_velocities, SCREEN_UV);
 	float mask_alpha = mask_texture.a;
 	mask_texture.a = 1.0;
-	mask_texture.b = 0.0;
-	vec2 new_uv = mask_texture.rg*SCREEN_PIXEL_SIZE*10.0;
+//	mask_texture.b = 0.0;
+	vec2 new_uv = velocities_texture.rg*SCREEN_PIXEL_SIZE*10.0;
 	vec4 new_screen_texture = texture(SCREEN_TEXTURE, SCREEN_UV+new_uv);
+	vec4 new_mask_texture;
+	vec4 new_color;
+	for(int i = 0; i < 10; i++){
+		new_uv = -velocities_texture.rg*SCREEN_PIXEL_SIZE*10.0*float(i)/10.0;
+		new_screen_texture = texture(SCREEN_TEXTURE, SCREEN_UV+new_uv);
+		new_mask_texture = texture(object_masker, SCREEN_UV+new_uv);
+		new_color += (new_screen_texture*new_mask_texture)/10.0;
+	}
 //	COLOR = mix(screen_texture,new_screen_texture,float(SCREEN_UV.x<(0.5*sin(TIME)+0.5)));
-//	COLOR = mix(screen_texture,mask_texture,float(SCREEN_UV.x<0.5));
-	COLOR = mix(screen_texture,new_screen_texture,mixerthing);
+//	COLOR = mix(mix(screen_texture,mask_texture,float(SCREEN_UV.x<0.5)),velocities_texture,float(SCREEN_UV.y>0.5));
+	COLOR = mix(screen_texture,new_color,mixerthing);
 	COLOR.a = 1.0;
 }
 
@@ -50,11 +60,15 @@ void light() {
 [sub_resource type="ViewportTexture" id=7]
 viewport_path = NodePath("Advanced Camera/Viewport")
 
+[sub_resource type="ViewportTexture" id=8]
+viewport_path = NodePath("Advanced Camera/Velocity Viewport")
+
 [sub_resource type="ShaderMaterial" id=6]
 resource_local_to_scene = true
 shader = SubResource( 4 )
-shader_param/mixerthing = 0.479
+shader_param/mixerthing = 1.0
 shader_param/object_masker = SubResource( 7 )
+shader_param/object_velocities = SubResource( 8 )
 
 [node name="phys test" type="Spatial" groups=["Arbitrary Data Recievers"]]
 pause_mode = 2

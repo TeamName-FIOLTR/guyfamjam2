@@ -4,9 +4,10 @@
 
 [node name="Advanced Camera" type="Camera"]
 transform = Transform( 0.787473, -0.463601, 0.406152, 0, 0.658965, 0.752173, -0.616349, -0.592316, 0.518917, 4.67567, 14.352, 4.08617 )
-cull_mask = 1048573
+cull_mask = 1048569
 script = ExtResource( 1 )
 masking_camera_path = NodePath("Viewport/Masking Camera")
+velocity_camera_path = NodePath("Velocity Viewport/Velocity Camera")
 
 [node name="Viewport" type="Viewport" parent="."]
 size = Vector2( 1920, 1080 )
@@ -15,4 +16,13 @@ usage = 3
 render_target_update_mode = 3
 
 [node name="Masking Camera" type="Camera" parent="Viewport"]
-cull_mask = 1048574
+cull_mask = 1048570
+
+[node name="Velocity Viewport" type="Viewport" parent="."]
+size = Vector2( 1920, 1080 )
+transparent_bg = true
+usage = 3
+render_target_update_mode = 3
+
+[node name="Velocity Camera" type="Camera" parent="Velocity Viewport"]
+cull_mask = 1048572
